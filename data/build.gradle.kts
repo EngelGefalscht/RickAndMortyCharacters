@@ -1,25 +1,21 @@
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     id("kotlin-kapt")
 }
 
 android {
-    namespace = "com.cda.rickandmortycharacters"
+    namespace = "com.cda.data"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.cda.rickandmortycharacters"
         minSdk = 24
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -39,37 +35,38 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
-    buildFeatures {
-        compose = true
-    }
 }
 
 dependencies {
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.graphics)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.compose.material3)
-
-    implementation(project(":data"))
     implementation(project(":domain"))
-    implementation(project(":presentation"))
     implementation(project(":characters-paging"))
 
+    // DI
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
-    implementation(libs.androidx.navigation.compose)
+
+    // Network
+    api(libs.retrofit)
+    api(libs.retrofit.converter.moshi)
+    api(libs.okhttp)
+    api(libs.okhttp.logging)
+    api(libs.moshi)
+    api(libs.moshi.kotlin)
+    kapt(libs.moshi.kotlin.codegen)
+
+    // Local DB
+    api(libs.room.runtime)
+    api(libs.room.ktx)
+    api(libs.room.paging)
+    kapt(libs.room.compiler)
+
+    // Paging (runtime types used by Room paging + repositories)
+    implementation(libs.androidx.paging.runtime)
 
     coreLibraryDesugaring(libs.android.desugar.jdk.libs)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-    debugImplementation(libs.androidx.compose.ui.tooling)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
